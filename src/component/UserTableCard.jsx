@@ -4,7 +4,8 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import UserCard from './UserCard';
 import { IconButton, SnackbarContent } from '@mui/material';
-import EditUserModal from './EditUserModal'; // Import the new modal component
+import EditUserModal from './EditUserModal';
+import DeleteConfirmDialog from './DeleteDialog'; // Import the delete confirmation dialog
 
 // Create a dark theme similar to the Tailwind styling
 const darkTheme = createTheme({
@@ -74,9 +75,13 @@ const UserTableCard = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   
-  // New state for edit modal
+  // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchUsers = async (pageNumber) => {
     if (!token) return;
@@ -120,12 +125,20 @@ const UserTableCard = () => {
     setSnackbarOpen(true);
   };
 
-  const handleDelete = (userId) => {
-    setSnackbarMessage(`Deleted user with ID: ${userId}`);
-    setSnackbarOpen(true);
+  const handleDeleteClick = (userId) => {
+    // Find the user to delete
+    const userToDelete = users.find(user => user.id === userId);
+    setUserToDelete(userToDelete);
+    setDeleteDialogOpen(true);
+  };
 
-    // Simulate delete request (you can implement actual API call here)
+  const handleDeleteSuccess = (userId) => {
+    // Remove the user from the state
     setUsers(users.filter(user => user.id !== userId));
+    
+    // Show success message
+    setSnackbarMessage(`User deleted successfully!`);
+    setSnackbarOpen(true);
   };
 
   // Make sure we always have exactly 3 columns for large screens by calculating width
@@ -177,7 +190,11 @@ const UserTableCard = () => {
                     {...getGridItemProps()}
                     key={user.id}
                   >
-                    <UserCard user={user} onEdit={handleEdit} onDelete={handleDelete} />
+                    <UserCard 
+                      user={user} 
+                      onEdit={handleEdit} 
+                      onDelete={handleDeleteClick} // Updated to use handleDeleteClick instead
+                    />
                   </Grid>
                 ))}
               </Grid>
@@ -221,12 +238,20 @@ const UserTableCard = () => {
             />
           </Snackbar>
           
-          {/* Add the edit modal */}
+          {/* Edit modal */}
           <EditUserModal
             open={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             user={currentUser}
             onSuccess={handleUpdateSuccess}
+          />
+          
+          {/* Delete confirmation dialog */}
+          <DeleteConfirmDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            user={userToDelete}
+            onSuccess={handleDeleteSuccess}
           />
         </Container>
       </Box>

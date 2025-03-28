@@ -15,6 +15,11 @@ const UserCard = ({ user, onEdit, onDelete }) => {
       border: '1px solid #1f2937', // gray-800
       borderRadius: '0.5rem',
       boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      '&:hover': {
+        transform: 'scale(1.15)',
+        boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
+        cursor: 'pointer'
+      }
     }}>
       <CardContent sx={{ pt: 2, pb: 1, flexGrow: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -26,7 +31,14 @@ const UserCard = ({ user, onEdit, onDelete }) => {
               height: 48, 
               mr: 2,
               border: '2px solid #3b82f6', // blue-600
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.15)',
+                boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
+                cursor: 'pointer'
+              }
             }}
+         
           />
           <Typography variant="h6" component="div" noWrap sx={{ color: '#e5e7eb' }}> {/* gray-200 */}
             {user.first_name} {user.last_name}

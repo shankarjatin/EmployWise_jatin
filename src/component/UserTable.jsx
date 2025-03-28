@@ -190,7 +190,7 @@ const UserTable = () => {
         pt: 4, 
         pb: 4,
       }}>
-        <div className="w-full max-w-4xl">
+        <div className="w-full ">
           <TableContainer 
             component={Paper} 
             sx={{ 
@@ -199,6 +199,7 @@ const UserTable = () => {
               overflow: 'hidden',
               borderRadius: '0.5rem',
               border: '1px solid #1f2937', // gray-800
+              
             }}
           >
             <Table>
@@ -215,11 +216,21 @@ const UserTable = () => {
                 {users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <Avatar 
-                        src={user.avatar} 
-                        alt={user.first_name}
-                        sx={{ width: 36, height: 36, border: '2px solid #3b82f6' }}
-                      />
+                    <Avatar 
+  src={user.avatar} 
+  alt={user.first_name}
+  sx={{ 
+    width: 48, 
+    height: 48, 
+    border: '2px solid #3b82f6',
+    transition: 'all 0.2s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.15)',
+      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
+      cursor: 'pointer'
+    }
+  }}
+/>
                     </TableCell>
                     <TableCell>{user.first_name}</TableCell>
                     <TableCell>{user.last_name}</TableCell>
