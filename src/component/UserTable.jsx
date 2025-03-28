@@ -9,9 +9,13 @@ import {
   Paper,
   Avatar,
   TablePagination,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
-import { AuthContext } from '../../context/AuthContext'; // Import AuthContext
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const UserTable = () => {
   const { token } = useContext(AuthContext); // Get token from context
@@ -41,6 +45,16 @@ const UserTable = () => {
   }, [page, token]);
 
   const handleChangePage = (_, newPage) => setPage(newPage);
+  
+  const handleEdit = (userId) => {
+    console.log('Edit user:', userId);
+    // Add your edit logic here
+  };
+
+  const handleDelete = (userId) => {
+    console.log('Delete user:', userId);
+    // Add your delete logic here
+  };
 
   return (
     <TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto', marginTop: 4 }}>
@@ -51,6 +65,7 @@ const UserTable = () => {
             <TableCell><strong>First Name</strong></TableCell>
             <TableCell><strong>Last Name</strong></TableCell>
             <TableCell><strong>Email</strong></TableCell>
+            <TableCell><strong>Actions</strong></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -62,6 +77,26 @@ const UserTable = () => {
               <TableCell>{user.first_name}</TableCell>
               <TableCell>{user.last_name}</TableCell>
               <TableCell>{user.email}</TableCell>
+              <TableCell>
+                <Tooltip title="Edit">
+                  <IconButton 
+                    color="primary" 
+                    onClick={() => handleEdit(user.id)}
+                    size="small"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton 
+                    color="error" 
+                    onClick={() => handleDelete(user.id)}
+                    size="small"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
