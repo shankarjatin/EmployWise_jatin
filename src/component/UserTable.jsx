@@ -20,8 +20,9 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext
-import EditUserModal from './EditUserModal'; // Import the edit modal component
+import { AuthContext } from '../context/AuthContext';
+import EditUserModal from './EditUserModal';
+import DeleteConfirmDialog from './DeleteDialog'; // Import the delete confirmation dialog
 
 // Create a dark theme similar to the Tailwind styling
 const darkTheme = createTheme({
@@ -105,7 +106,7 @@ const darkTheme = createTheme({
 });
 
 const UserTable = () => {
-  const { token } = useContext(AuthContext); // Get token from context
+  const { token } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -113,9 +114,13 @@ const UserTable = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   
-  // Add state for edit modal
+  // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchUsers = async (pageNumber) => {
     if (!token) return;
@@ -157,13 +162,20 @@ const UserTable = () => {
     setSnackbarOpen(true);
   };
 
-  const handleDelete = (userId) => {
-    // Show delete message
-    setSnackbarMessage(`Deleted user with ID: ${userId}`);
-    setSnackbarOpen(true);
-    
-    // Simulate delete request (you can implement actual API call here)
+  const handleDeleteClick = (userId) => {
+    // Find the user to delete
+    const userToDelete = users.find(user => user.id === userId);
+    setUserToDelete(userToDelete);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSuccess = (userId) => {
+    // Remove the user from the state
     setUsers(users.filter(user => user.id !== userId));
+    
+    // Show success message
+    setSnackbarMessage(`User deleted successfully!`);
+    setSnackbarOpen(true);
   };
 
   return (
@@ -226,7 +238,7 @@ const UserTable = () => {
                       <Tooltip title="Delete">
                         <IconButton 
                           color="error" 
-                          onClick={() => handleDelete(user.id)}
+                          onClick={() => handleDeleteClick(user.id)}
                           size="small"
                         >
                           <DeleteIcon fontSize="small" />
@@ -255,7 +267,7 @@ const UserTable = () => {
             />
           </TableContainer>
         
-          {/* Add the edit modal */}
+          {/* Edit modal */}
           <EditUserModal
             open={editModalOpen}
             onClose={() => setEditModalOpen(false)}
@@ -263,7 +275,15 @@ const UserTable = () => {
             onSuccess={handleUpdateSuccess}
           />
 
-          {/* Add snackbar for notifications */}
+          {/* Delete confirmation dialog */}
+          <DeleteConfirmDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            user={userToDelete}
+            onSuccess={handleDeleteSuccess}
+          />
+
+          {/* Snackbar for notifications */}
           <Snackbar
             open={snackbarOpen}
             autoHideDuration={3000}
