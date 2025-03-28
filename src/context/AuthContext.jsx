@@ -9,9 +9,15 @@ export const AuthProvider = ({ children }) => {
     if (token) localStorage.setItem('token', token);
     else localStorage.removeItem('token');
   }, [token]);
+  
+  // Logout function to clear authentication
+  const logout = () => {
+    setToken(''); // Clear the token from state
+    // The useEffect will handle removing from localStorage when token becomes empty
+  };
 
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider value={{ token, setToken, logout }}>
       {children}
     </AuthContext.Provider>
   );
