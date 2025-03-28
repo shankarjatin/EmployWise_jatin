@@ -1,277 +1,73 @@
-import React, { useEffect, useState, useContext } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Avatar,
-  TablePagination,
-  IconButton,
-  Tooltip,
-  createTheme,
-  ThemeProvider,
-  Snackbar,
-  SnackbarContent
-} from '@mui/material';
+import React from 'react';
+import { Card, CardContent, Typography, Box, IconButton, CardActions, Avatar } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
-import EditUserModal from './EditUserModal'; // Import the edit modal
 
-// Create a dark theme similar to the Tailwind styling
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#3b82f6', // blue-600
-    },
-    error: {
-      main: '#ef4444', // red-500
-    },
-    background: {
-      paper: '#111827', // gray-900
-      default: '#030712', // gray-950
-    },
-    text: {
-      primary: '#e5e7eb', // gray-200
-      secondary: '#9ca3af', // gray-400
-    },
-  },
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#111827', // gray-900
-          borderRadius: '0.5rem',
-          border: '1px solid #1f2937', // gray-800
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        },
-      },
-    },
-    MuiTableHead: {
-      styleOverrides: {
-        root: {
-          '& .MuiTableCell-root': {
-            fontWeight: 600,
-            backgroundColor: '#1f2937', // gray-800
-          },
-        },
-      },
-    },
-    MuiTableRow: {
-      styleOverrides: {
-        root: {
-          '&:nth-of-type(odd)': {
-            backgroundColor: 'rgba(17, 24, 39, 0.8)', // gray-900 with opacity
-          },
-          '&:hover': {
-            backgroundColor: '#1f2937', // gray-800
-            transition: 'background-color 0.2s',
-          },
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          borderBottom: '1px solid #1f2937', // gray-800
-          padding: '12px 16px',
-        },
-      },
-    },
-    MuiTablePagination: {
-      styleOverrides: {
-        root: {
-          color: '#9ca3af', // gray-400
-        },
-        select: {
-          backgroundColor: '#1f2937', // gray-800
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          border: '2px solid #3b82f6', // blue-600
-        },
-      },
-    },
-  },
-});
-
-const UserTable = () => {
-  const { token } = useContext(AuthContext); // Get token from context
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [rowsPerPage] = useState(6);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  
-  // New state for edit modal
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  const fetchUsers = async (pageNumber) => {
-    if (!token) return;
-
-    try {
-      const res = await axios.get(`https://reqres.in/api/users?page=${pageNumber + 1}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUsers(res.data.data);
-      setTotalPages(res.data.total_pages);
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers(page);
-  }, [page, token]);
-
-  const handleChangePage = (_, newPage) => setPage(newPage);
-  
-  const handleEdit = (userId) => {
-    // Find the user to edit
-    const userToEdit = users.find(user => user.id === userId);
-    setCurrentUser(userToEdit);
-    setEditModalOpen(true);
-  };
-
-  const handleUpdateSuccess = (updatedUser) => {
-    // Update the user in the state
-    setUsers(users.map(user => 
-      user.id === updatedUser.id ? updatedUser : user
-    ));
-    
-    setSnackbarMessage(`User ${updatedUser.first_name} updated successfully!`);
-    setSnackbarOpen(true);
-  };
-
-  const handleDelete = (userId) => {
-    setSnackbarMessage(`Deleted user with ID: ${userId}`);
-    setSnackbarOpen(true);
-    
-    // Simulate delete request (you can implement actual API call here)
-    setUsers(users.filter(user => user.id !== userId));
-  };
-
+const UserCard = ({ user, onEdit, onDelete }) => {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <div className="flex justify-center bg-gray-950 p-4">
-        <TableContainer 
-          component={Paper} 
+    <Card sx={{ 
+      width: '100%', 
+      height: '100%', // Ensures equal height for all cards
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      backgroundColor: '#111827', // gray-900
+      border: '1px solid #1f2937', // gray-800
+      borderRadius: '0.5rem',
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    }}>
+      <CardContent sx={{ pt: 2, pb: 1, flexGrow: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Avatar 
+            src={user.avatar} 
+            alt={`${user.first_name} ${user.last_name}`}
+            sx={{ 
+              width: 48, 
+              height: 48, 
+              mr: 2,
+              border: '2px solid #3b82f6', // blue-600
+            }}
+          />
+          <Typography variant="h6" component="div" noWrap sx={{ color: '#e5e7eb' }}> {/* gray-200 */}
+            {user.first_name} {user.last_name}
+          </Typography>
+        </Box>
+        
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" sx={{ color: '#9ca3af' }} noWrap> {/* gray-400 */}
+            <strong>Email:</strong> {user.email}
+          </Typography>
+        </Box>
+      </CardContent>
+
+      <CardActions sx={{ justifyContent: 'flex-end', p: 1, borderTop: '1px solid #1f2937' }}> {/* gray-800 */}
+        <IconButton 
+          onClick={() => onEdit(user.id)} 
           sx={{ 
-            maxWidth: 900,
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            overflow: 'hidden',
-            borderRadius: '0.5rem',
-            border: '1px solid #1f2937', // gray-800
-          }}
+            color: '#3b82f6', // blue-600
+            '&:hover': {
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            } 
+          }} 
+          size="small"
         >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Avatar</strong></TableCell>
-                <TableCell><strong>First Name</strong></TableCell>
-                <TableCell><strong>Last Name</strong></TableCell>
-                <TableCell><strong>Email</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Avatar 
-                      src={user.avatar} 
-                      alt={user.first_name}
-                      sx={{ width: 36, height: 36, border: '2px solid #3b82f6' }}
-                    />
-                  </TableCell>
-                  <TableCell>{user.first_name}</TableCell>
-                  <TableCell>{user.last_name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Tooltip title="Edit">
-                      <IconButton 
-                        color="primary" 
-                        onClick={() => handleEdit(user.id)}
-                        size="small"
-                        sx={{ mr: 1 }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton 
-                        color="error" 
-                        onClick={() => handleDelete(user.id)}
-                        size="small"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <TablePagination
-            component="div"
-            count={totalPages * rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[6]}
-            sx={{
-              color: '#9ca3af', // gray-400
-              borderTop: '1px solid #1f2937', // gray-800
-              '.MuiTablePagination-selectIcon': {
-                color: '#9ca3af', // gray-400
-              },
-            }}
-          />
-        </TableContainer>
-
-        {/* Add the edit modal */}
-        <EditUserModal
-          open={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          user={currentUser}
-          onSuccess={handleUpdateSuccess}
-        />
-
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={() => setSnackbarOpen(false)}
+          <EditIcon fontSize="small" />
+        </IconButton>
+        <IconButton 
+          onClick={() => onDelete(user.id)} 
+          sx={{ 
+            color: '#ef4444', // red-500
+            '&:hover': {
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            } 
+          }} 
+          size="small"
         >
-          <SnackbarContent
-            sx={{
-              backgroundColor: '#1f2937', // gray-800
-              color: '#e5e7eb', // gray-200
-              border: '1px solid #374151', // gray-700
-            }}
-            message={snackbarMessage}
-            action={
-              <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
-                &times;
-              </IconButton>
-            }
-          />
-        </Snackbar>
-      </div>
-    </ThemeProvider>
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+      </CardActions>
+    </Card>
   );
 };
 
-export default UserTable;
+export default UserCard;

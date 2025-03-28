@@ -13,11 +13,15 @@ import {
   Tooltip,
   createTheme,
   ThemeProvider,
+  Snackbar,
+  SnackbarContent,
+  Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import EditUserModal from './EditUserModal'; // Import the edit modal component
 
 // Create a dark theme similar to the Tailwind styling
 const darkTheme = createTheme({
@@ -106,6 +110,12 @@ const UserTable = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [rowsPerPage] = useState(6);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  
+  // Add state for edit modal
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const fetchUsers = async (pageNumber) => {
     if (!token) return;
@@ -130,94 +140,152 @@ const UserTable = () => {
   const handleChangePage = (_, newPage) => setPage(newPage);
   
   const handleEdit = (userId) => {
-    console.log('Edit user:', userId);
-    // Add your edit logic here
+    // Find the user to edit
+    const userToEdit = users.find(user => user.id === userId);
+    setCurrentUser(userToEdit);
+    setEditModalOpen(true);
+  };
+
+  const handleUpdateSuccess = (updatedUser) => {
+    // Update the user in the state
+    setUsers(users.map(user => 
+      user.id === updatedUser.id ? updatedUser : user
+    ));
+    
+    // Show success message
+    setSnackbarMessage(`User ${updatedUser.first_name} updated successfully!`);
+    setSnackbarOpen(true);
   };
 
   const handleDelete = (userId) => {
-    console.log('Delete user:', userId);
-    // Add your delete logic here
+    // Show delete message
+    setSnackbarMessage(`Deleted user with ID: ${userId}`);
+    setSnackbarOpen(true);
+    
+    // Simulate delete request (you can implement actual API call here)
+    setUsers(users.filter(user => user.id !== userId));
   };
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <div className="flex justify-center bg-gray-950 p-4">
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
-            maxWidth: 900,
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            overflow: 'hidden',
-            borderRadius: '0.5rem',
-            border: '1px solid #1f2937', // gray-800
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Avatar</strong></TableCell>
-                <TableCell><strong>First Name</strong></TableCell>
-                <TableCell><strong>Last Name</strong></TableCell>
-                <TableCell><strong>Email</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Avatar 
-                      src={user.avatar} 
-                      alt={user.first_name}
-                      sx={{ width: 36, height: 36, border: '2px solid #3b82f6' }}
-                    />
-                  </TableCell>
-                  <TableCell>{user.first_name}</TableCell>
-                  <TableCell>{user.last_name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Tooltip title="Edit">
-                      <IconButton 
-                        color="primary" 
-                        onClick={() => handleEdit(user.id)}
-                        size="small"
-                        sx={{ mr: 1 }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton 
-                        color="error" 
-                        onClick={() => handleDelete(user.id)}
-                        size="small"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <TablePagination
-            component="div"
-            count={totalPages * rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[6]}
-            sx={{
-              color: '#9ca3af', // gray-400
-              borderTop: '1px solid #1f2937', // gray-800
-              '.MuiTablePagination-selectIcon': {
-                color: '#9ca3af', // gray-400
-              },
+      <Box sx={{ 
+        minHeight: '100vh',
+        width: '100%',
+        backgroundColor: '#030712', // gray-950
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        pt: 4, 
+        pb: 4,
+      }}>
+        <div className="w-full max-w-4xl">
+          <TableContainer 
+            component={Paper} 
+            sx={{ 
+              width: '100%',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              overflow: 'hidden',
+              borderRadius: '0.5rem',
+              border: '1px solid #1f2937', // gray-800
             }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Avatar</strong></TableCell>
+                  <TableCell><strong>First Name</strong></TableCell>
+                  <TableCell><strong>Last Name</strong></TableCell>
+                  <TableCell><strong>Email</strong></TableCell>
+                  <TableCell><strong>Actions</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <Avatar 
+                        src={user.avatar} 
+                        alt={user.first_name}
+                        sx={{ width: 36, height: 36, border: '2px solid #3b82f6' }}
+                      />
+                    </TableCell>
+                    <TableCell>{user.first_name}</TableCell>
+                    <TableCell>{user.last_name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Tooltip title="Edit">
+                        <IconButton 
+                          color="primary" 
+                          onClick={() => handleEdit(user.id)}
+                          size="small"
+                          sx={{ mr: 1 }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton 
+                          color="error" 
+                          onClick={() => handleDelete(user.id)}
+                          size="small"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <TablePagination
+              component="div"
+              count={totalPages * rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[6]}
+              sx={{
+                color: '#9ca3af', // gray-400
+                borderTop: '1px solid #1f2937', // gray-800
+                '.MuiTablePagination-selectIcon': {
+                  color: '#9ca3af', // gray-400
+                },
+              }}
+            />
+          </TableContainer>
+        
+          {/* Add the edit modal */}
+          <EditUserModal
+            open={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            user={currentUser}
+            onSuccess={handleUpdateSuccess}
           />
-        </TableContainer>
-      </div>
+
+          {/* Add snackbar for notifications */}
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          >
+            <SnackbarContent
+              sx={{
+                backgroundColor: '#1f2937', // gray-800
+                color: '#e5e7eb', // gray-200
+                border: '1px solid #374151', // gray-700
+              }}
+              message={snackbarMessage}
+              action={
+                <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
+                  &times;
+                </IconButton>
+              }
+            />
+          </Snackbar>
+        </div>
+      </Box>
     </ThemeProvider>
   );
 };
