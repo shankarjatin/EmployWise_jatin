@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import UserCard from './UserCard';
 import { IconButton, SnackbarContent } from '@mui/material';
+import EditUserModal from './EditUserModal'; // Import the new modal component
 
 // Create a dark theme similar to the Tailwind styling
 const darkTheme = createTheme({
@@ -72,6 +73,10 @@ const UserTableCard = () => {
   const [rowsPerPage] = useState(6);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  
+  // New state for edit modal
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const fetchUsers = async (pageNumber) => {
     if (!token) return;
@@ -99,7 +104,19 @@ const UserTableCard = () => {
   const handleChangePage = (_, newPage) => setPage(newPage);
 
   const handleEdit = (userId) => {
-    setSnackbarMessage(`Editing user with ID: ${userId}`);
+    // Find the user to edit
+    const userToEdit = users.find(user => user.id === userId);
+    setCurrentUser(userToEdit);
+    setEditModalOpen(true);
+  };
+
+  const handleUpdateSuccess = (updatedUser) => {
+    // Update the user in the state
+    setUsers(users.map(user => 
+      user.id === updatedUser.id ? updatedUser : user
+    ));
+    
+    setSnackbarMessage(`User ${updatedUser.first_name} updated successfully!`);
     setSnackbarOpen(true);
   };
 
@@ -203,6 +220,14 @@ const UserTableCard = () => {
               }
             />
           </Snackbar>
+          
+          {/* Add the edit modal */}
+          <EditUserModal
+            open={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            user={currentUser}
+            onSuccess={handleUpdateSuccess}
+          />
         </Container>
       </Box>
     </ThemeProvider>
