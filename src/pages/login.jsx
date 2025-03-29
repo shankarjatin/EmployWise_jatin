@@ -4,13 +4,14 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthContext } from '../context/AuthContext';
-import { Button, Box } from '@mui/material';
+import { Button } from '@mui/material';
 // Import your video directly from assets
 import backgroundVideo from '../assets/earth.mp4';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Pre-filled with the required credentials
+  const [email, setEmail] = useState('eve.holt@reqres.in');
+  const [password, setPassword] = useState('cityslicka');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -105,7 +106,7 @@ const LoginPage = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-gray-950">
-      {/* Background Video Container with improved z-index */}
+      {/* Background Video Container with fixed z-index */}
       <div 
         style={{
           position: 'fixed',
@@ -113,12 +114,12 @@ const LoginPage = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: -2,
+          zIndex: 0, // Changed from -2 to 0
           backgroundColor: '#030712',
           overflow: 'hidden',
         }}
       >
-        {/* Video Element */}
+        {/* Video Element with fixed z-index */}
         <video
           ref={videoRef}
           autoPlay
@@ -127,8 +128,8 @@ const LoginPage = () => {
           playsInline
           className="absolute object-cover w-full h-full"
           style={{
-            zIndex: 4,
-            opacity: videoLoaded ? 1 : 0,
+            zIndex: -1, // Changed from 4 to -1 so it appears behind the overlay
+            opacity: videoLoaded ? 0.4 : 0, // Changed from 1 to 0.4 for better readability
             transition: 'opacity 1s ease-in-out',
           }}
         >
@@ -145,7 +146,7 @@ const LoginPage = () => {
             width: '100%',
             height: '100%',
             backgroundColor: 'rgba(3, 7, 18, 0.7)',
-            zIndex: 0,
+            zIndex: 1, // Changed from 0 to 1 so it appears above the video
           }}
         />
       </div>
