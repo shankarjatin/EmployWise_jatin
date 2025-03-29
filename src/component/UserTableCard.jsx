@@ -157,14 +157,13 @@ const UserTableCard = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <Box sx={{ 
-        minHeight: '100vh',
-        width: '100%',
-        backgroundColor: '#030712', // gray-950
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center', // Center content vertically
-        pt: 4, 
-        pb: 4,
+       width: '100%',
+       backgroundColor: '#030712', // gray-950
+       display: 'flex',
+       justifyContent: 'center',
+       alignItems: 'flex-start', // Changed from 'center' to 'flex-start' to remove extra space
+     
+       pb: 4,
       }}>
         <Container maxWidth="lg" disableGutters>
           <Box sx={{ 
@@ -172,6 +171,7 @@ const UserTableCard = () => {
             padding: { xs: 2, sm: 3, md: 4 },
             backgroundColor: '#111827', // gray-900
             borderRadius: '0.5rem',
+           
             border: '1px solid #1f2937', // gray-800
             boxShadow: '0 20px 25px -5px rgba(28, 17, 17, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           }}>
@@ -187,6 +187,7 @@ const UserTableCard = () => {
                 sx={{
                   width: '100%',
                   margin: 0, // Remove default margin from Grid container
+                  
                 }}
               >
                 {users.map((user) => (

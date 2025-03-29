@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthContext } from '../context/AuthContext';
-import { Button } from '@mui/material';
+import { Button, Box } from '@mui/material';
 // Import your video directly from assets
 import backgroundVideo from '../assets/earth.mp4';
 
@@ -18,29 +18,39 @@ const LoginPage = () => {
   const { setToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Handle video load event with improved loading detection
+  // Enhanced video loading detection
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      // Try to set loaded state if video is already loaded
+      console.log("Video element initialized");
+      
+      // Check if video is already loaded
       if (video.readyState >= 3) {
+        console.log("Video already loaded");
         setVideoLoaded(true);
       }
-
-      const handleLoadedData = () => {
-        console.log('Video loaded successfully');
+      
+      // Set up multiple event listeners for better detection
+      const handleVideoReady = () => {
+        console.log("Video is ready to play");
         setVideoLoaded(true);
       };
       
-      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('loadeddata', handleVideoReady);
+      video.addEventListener('canplay', handleVideoReady);
+      video.addEventListener('playing', handleVideoReady);
       
-      // Add canplaythrough event as a backup
-      video.addEventListener('canplaythrough', handleLoadedData);
+      // Force video to show after a timeout as fallback
+      const timer = setTimeout(() => {
+        console.log("Forcing video display via timeout");
+        setVideoLoaded(true);
+      }, 1000);
       
-      // Clean up event listeners on unmount
       return () => {
-        video.removeEventListener('loadeddata', handleLoadedData);
-        video.removeEventListener('canplaythrough', handleLoadedData);
+        clearTimeout(timer);
+        video.removeEventListener('loadeddata', handleVideoReady);
+        video.removeEventListener('canplay', handleVideoReady);
+        video.removeEventListener('playing', handleVideoReady);
       };
     }
   }, []);
@@ -95,8 +105,19 @@ const LoginPage = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-gray-950">
-      {/* Background Video Container */}
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      {/* Background Video Container with improved z-index */}
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -2,
+          backgroundColor: '#030712',
+          overflow: 'hidden',
+        }}
+      >
         {/* Video Element */}
         <video
           ref={videoRef}
@@ -104,20 +125,33 @@ const LoginPage = () => {
           loop
           muted
           playsInline
-          className="absolute h-full w-full object-cover"
+          className="absolute object-cover w-full h-full"
           style={{
-            opacity: videoLoaded ? 0.4 : 0,
+            zIndex: 4,
+            opacity: videoLoaded ? 1 : 0,
             transition: 'opacity 1s ease-in-out',
           }}
         >
           <source src={backgroundVideo} type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
         
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-gray-950 bg-opacity-70"></div>
+        {/* Dark overlay for better readability */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(3, 7, 18, 0.7)',
+            zIndex: 0,
+          }}
+        />
       </div>
 
-      <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-xl bg-opacity-85 backdrop-blur-sm z-10">
+      {/* Login Form */}
+      <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-xl bg-opacity-85 backdrop-blur-sm z-10 relative">
         <div className="p-8">
           <div className="mb-6 flex justify-center">
             <div className="h-12 w-12 rounded-full bg-blue-600 text-center text-2xl font-bold leading-[48px] text-white">
@@ -195,7 +229,7 @@ const LoginPage = () => {
           </form>
         </div>
       </div>
-      <ToastContainer position="bottom-center" />
+      <ToastContainer position="top-center" zIndex={9999} />
     </div>
   );
 };
