@@ -141,12 +141,16 @@ const UserTableCard = () => {
     setSnackbarOpen(true);
   };
 
-  // Make sure we always have exactly 3 columns for large screens by calculating width
+  // Updated Grid item props with center alignment
   const getGridItemProps = () => {
     return {
       xs: 12,          // Full width on mobile (1 card)
       sm: 6,           // Half width on tablets (2 cards)
       md: 4,           // One-third width on desktop (3 cards)
+      sx: {
+        display: 'flex',
+        justifyContent: 'center', // Center the card horizontally in the grid cell
+      }
     };
   };
 
@@ -158,7 +162,7 @@ const UserTableCard = () => {
         backgroundColor: '#030712', // gray-950
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'flex-start',
+        alignItems: 'center', // Center content vertically
         pt: 4, 
         pb: 4,
       }}>
@@ -169,7 +173,7 @@ const UserTableCard = () => {
             backgroundColor: '#111827', // gray-900
             borderRadius: '0.5rem',
             border: '1px solid #1f2937', // gray-800
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            boxShadow: '0 20px 25px -5px rgba(28, 17, 17, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           }}>
             {loading ? (
               <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -179,9 +183,10 @@ const UserTableCard = () => {
               <Grid 
                 container 
                 spacing={3}
+                justifyContent="center" // Center the grid items horizontally
                 sx={{
                   width: '100%',
-                  margin: 0 // Remove default margin from Grid container
+                  margin: 0, // Remove default margin from Grid container
                 }}
               >
                 {users.map((user) => (
@@ -193,7 +198,11 @@ const UserTableCard = () => {
                     <UserCard 
                       user={user} 
                       onEdit={handleEdit} 
-                      onDelete={handleDeleteClick} // Updated to use handleDeleteClick instead
+                      onDelete={handleDeleteClick}
+                      sx={{ 
+                        width: { xs: '100%', sm: '280px' }, // Fixed width on larger screens
+                        maxWidth: '100%',
+                      }}
                     />
                   </Grid>
                 ))}
@@ -219,24 +228,30 @@ const UserTableCard = () => {
           </Box>
 
           <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-          >
-            <SnackbarContent
-              sx={{
-                backgroundColor: '#1f2937', // gray-800
-                color: '#e5e7eb', // gray-200
-                border: '1px solid #374151', // gray-700
-              }}
-              message={snackbarMessage}
-              action={
-                <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
-                  &times;
-                </IconButton>
-              }
-            />
-          </Snackbar>
+  open={snackbarOpen}
+  autoHideDuration={3000}
+  onClose={() => setSnackbarOpen(false)}
+  anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position at top-center instead of bottom
+  sx={{
+    zIndex: 1500, // Higher than the footer's z-index (100)
+  }}
+>
+  <SnackbarContent
+    sx={{
+      backgroundColor: '#1f2937', // gray-800
+      color: '#e5e7eb', // gray-200
+      border: '1px solid #374151', // gray-700
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      marginBottom: 2, // Add some margin so it's not flush with the top
+    }}
+    message={snackbarMessage}
+    action={
+      <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
+        &times;
+      </IconButton>
+    }
+  />
+</Snackbar>
           
           {/* Edit modal */}
           <EditUserModal

@@ -196,7 +196,7 @@ const UserTable = () => {
             sx={{ 
               width: '100%',
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-              overflow: 'hidden',
+            //   overflow: 'hidden',
             //   borderRadius: '0.5rem',
               border: '1px solid #1f2937', // gray-800
               
@@ -296,25 +296,30 @@ const UserTable = () => {
 
           {/* Snackbar for notifications */}
           <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          >
-            <SnackbarContent
-              sx={{
-                backgroundColor: '#1f2937', // gray-800
-                color: '#e5e7eb', // gray-200
-                border: '1px solid #374151', // gray-700
-              }}
-              message={snackbarMessage}
-              action={
-                <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
-                  &times;
-                </IconButton>
-              }
-            />
-          </Snackbar>
+  open={snackbarOpen}
+  autoHideDuration={3000}
+  onClose={() => setSnackbarOpen(false)}
+  anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position at top-center instead of bottom
+  sx={{
+    zIndex: 1500, // Higher than the footer's z-index (100)
+  }}
+>
+  <SnackbarContent
+    sx={{
+      backgroundColor: '#1f2937', // gray-800
+      color: '#e5e7eb', // gray-200
+      border: '1px solid #374151', // gray-700
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      marginBottom: 2, // Add some margin so it's not flush with the top
+    }}
+    message={snackbarMessage}
+    action={
+      <IconButton size="small" color="inherit" onClick={() => setSnackbarOpen(false)}>
+        &times;
+      </IconButton>
+    }
+  />
+</Snackbar>
         </div>
       </Box>
     </ThemeProvider>

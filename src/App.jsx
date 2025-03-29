@@ -5,6 +5,7 @@ import HomePage from './pages/home';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import PublicRoute from './routes/PublicRoute';
+import Footer from './component/Footer';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             }
           />
         </Routes>
+        <Footer />
       </Router>
     </AuthProvider>
   );

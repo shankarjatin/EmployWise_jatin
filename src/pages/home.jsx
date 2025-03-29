@@ -9,6 +9,7 @@ import UserTableCard from '../component/UserTableCard';
 import { AuthContext } from '../context/AuthContext';
 // Import your video directly from assets
 import backgroundVideo from '../assets/earth.mp4';
+import Footer from '../component/Footer';
 
 // Create a dark theme similar to the Tailwind styling
 const darkTheme = createTheme({
@@ -220,6 +221,7 @@ const HomePage = () => {
           {viewMode === 'table' ? <UserTable /> : <UserTableCard />}
         </Box>
       </Box>
+       <Footer />
     </ThemeProvider>
   );
 };
