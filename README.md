@@ -2,7 +2,7 @@
 
 ## ✨ Overview
 
-##The EmployWise Assignment is a React-based web application that integrates with the Reqres API to perform basic user management functions, including authentication, user listing, and user modification (edit & delete). This document provides details on the implementation, technologies used, and setup instructions.
+## The EmployWise Assignment is a React-based web application that integrates with the Reqres API to perform basic user management functions, including authentication, user listing, and user modification (edit & delete). This document provides details on the implementation, technologies used, and setup instructions.
 
 ## Screenshots
 
